@@ -46,12 +46,14 @@ def organizations_list(request):
 
 @login_required
 def add_organization(request):
-    users = CRMUser.objects.filter(is_active=True).order_by('email')
+    users = User.objects.filter(is_active=True).order_by('email')
     form = OrganizationForm(assigned_to=users)
     address_form = BillingAddressForm()
     teams = Team.objects.all()
     assignedto_list = request.POST.getlist('assigned_to')
     teams_list = request.POST.getlist('teams')
+    print('Request:',CRMUser.objects.get(pk=request.user.pk).id)
+    u = CRMUser.objects.get(pk=request.user.pk)
     if request.method == 'POST':
         form = OrganizationForm(request.POST, assigned_to=users)
         address_form = BillingAddressForm(request.POST)
@@ -59,7 +61,7 @@ def add_organization(request):
             address_obj = address_form.save()
             org_obj = form.save(commit=False)
             org_obj.address = address_obj
-            org_obj.created_by = request.user
+            org_obj.created_by = u
             org_obj.save()
             org_obj.assigned_to.add(*assignedto_list)
             org_obj.teams.add(*teams_list)

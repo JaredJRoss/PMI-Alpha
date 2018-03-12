@@ -736,7 +736,6 @@ def extract_all_skills(resume):
     skill_list = list(data['Skill Names'])
     skill_list = set(skill_list)
     skill_list= [skill.lower() for skill in skill_list]
-
     filename ='all_text1.txt'
     trained_resume_path = os.path.join('Trained Resumes', filename)
 

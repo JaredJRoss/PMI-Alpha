@@ -66,6 +66,8 @@ urlpatterns = [
     url(r'^delete_club/(?P<pk>\d+)/$', views.club_delete, name='club-delete'),
     url(r'^delete_volunteer/(?P<pk>\d+)/$', views.volunteer_delete, name='volunteer-delete'),
     url(r'^delete_professional/(?P<pk>\d+)/$', views.professional_delete, name='professional-delete'),
+    url(r'^delete_cert/(?P<pk>\d+)/$', views.certification_delete, name='certfication-delete'),
+    url(r'^delete_training/(?P<pk>\d+)/$', views.training_delete, name='training-delete'),
 
     #ocr search
     url(r'^resumesearch',OCRSearch, name='ocrsearch'),

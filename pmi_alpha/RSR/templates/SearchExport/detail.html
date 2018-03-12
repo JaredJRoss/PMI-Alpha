@@ -54,10 +54,13 @@
    <tbody class="table-hover">
  {% for field in person %}
    <tr>
+     {% if field.0 == 'Resume'%}
+     <td class = "text-left" style="padding:10px;font-weight: bold;">{{field.0}}</td>
+     <td style ="word-wrap:break-word;padding:10px;" class = "text-left"> <a class = "button-style" href="{{ field.1 }}">View</a></td>
+     {% else %}
        <td class = "text-left" style="padding:10px;font-weight: bold;">{{field.0}}</td>
-
-
-         <td style ="word-wrap:break-word;padding:10px;" class = "text-left"> {{field.1}}</td>
+       <td style ="word-wrap:break-word;padding:10px;" class = "text-left"> {{field.1}}</td>
+      {% endif %}
 {% empty %}
 
          <td colspan="2">No data</td>
@@ -65,7 +68,14 @@
 
    </tr>
    {% endfor %}
-
+  <tr>
+    <td class = "text-left" style="padding:10px;font-weight: bold;">Positions</td>
+    <td style ="word-wrap:break-word;padding:10px;" class = "text-left">
+        {% for t in titles %}
+        {{t.TitleID.Name}},
+        {% endfor %}
+      </td>
+  </tr>
    </tbody>
  </table>
     <br/>

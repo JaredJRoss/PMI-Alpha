@@ -18,7 +18,8 @@ class Document(models.Model):
     docfile = models.FileField(upload_to='documents/%Y%m%d')
     def __unicode__(self):
         return u'%s' %self.docfile
-
+    def __str__(self):
+        return self.docfile.url   
     def delete(self, *args, **kwargs):
         os.remove(os.path.join(settings.MEDIA_ROOT, self.docfile.name))
         super(Document, self).delete(*args, **kwargs)
@@ -449,9 +450,12 @@ class PersonToTraining(models.Model):
     Start_date  = models.DateTimeField(verbose_name = "Start Date",null=True, blank=True)
     Completion_date = models.DateTimeField(verbose_name = "Completion Date", blank=True,null=True)
 class PersonToTitle(models.Model):
+    def __str__(self):
+        return self.PersonID.Name + ' - ' + self.TitleID.Name
     PersonID = models.ForeignKey(Person,  on_delete=models.CASCADE)
     TitleID = models.ForeignKey(Title,  on_delete=models.CASCADE)
-    
+
+
 class TitleToTrain(models.Model):
     def __str__(self):
         return self.TitleID.Name + ' - ' + self.TrainID.Name

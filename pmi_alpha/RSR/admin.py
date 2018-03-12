@@ -31,5 +31,5 @@ admin.site.register(PersonToSide)
 admin.site.register(PersonToVolunteering)
 admin.site.register(PersonToCert)
 admin.site.register(PersonToTraining)
-
 admin.site.register(Title)
+admin.site.register(PersonToTitle)

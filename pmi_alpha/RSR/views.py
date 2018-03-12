@@ -32,6 +32,8 @@ from django.views.generic.edit import UpdateView
 from dal import autocomplete
 from background_task import background
 from datetime import datetime
+from django.contrib.auth.models import User
+
 ### json Parsing ##
 import json
 from .parsing import *
@@ -101,14 +103,18 @@ def load_parsing_files():
          res2vec.save(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..','..','www','Parsing','vector_models1')))
 
 @background(schedule=timezone.now())
-def parse_back(words,doc_id,doc_type):
+def parse_back(words,doc_id,doc_type,userID):
     parsed_json  = parse_file(words)
     #either load json, or recieve json file
     js = parsed_json
     #iterate through json file
     print('\n\n',js,'\n\n')
     #initialize person out side of for loop/if statements so we can use it later
+
     person = Person(Name="temp")
+    user = User.objects.get(pk = userID)
+    print(user)
+    person.CreatedBy = user
     for key in js['person']:
         if key == "name":
             person.Name = js['person'][key]
@@ -348,6 +354,7 @@ def parse_back(words,doc_id,doc_type):
 @login_required
 def uploaddoc(request):
 # Handle file upload
+    print(User.objects.get(pk=request.user.pk))
     if request.method == 'POST':
         form = DocumentForm()
         print(request.FILES)
@@ -385,12 +392,12 @@ def uploaddoc(request):
                 temp_doc.save(update_fields=['wordstr'])
             print("temp:" ,temp_doc.docfile)
 
-            parse_back(temp_doc.wordstr,temp_doc.pk,temp_doc.type)
+            parse_back(temp_doc.wordstr,temp_doc.pk,temp_doc.type,request.user.pk)
     else:
         form = DocumentForm()
     documents = Document.objects.all()
     return render(request,'index.html',{'documents': documents,'form':form})
-    
+
 @background
 def do_ocr(doc_pk):
     words = ''
@@ -695,6 +702,27 @@ def clearance_edit(request,clearance_id):
 #end edit
 
 ##########delete##############
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def certification_delete(request,pk,template_name='detail.html'):
+    certfication = get_object_or_404(PersonToCert, pk=pk)
+    if request.method == 'POST':
+        person = Person.objects.get(pk=certfication.PersonID.pk)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        certfication.delete()
+        return HttpResponseRedirect(reverse('RSR:detail', args=[certfication.PersonID.pk]))
+    return render(request, template_name, {'object': certfication})
+
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def training_delete(request,pk,template_name='detail.html'):
+    training = get_object_or_404(PersonToTraining, pk=pk)
+    if request.method == 'POST':
+        person = Person.objects.get(pk=training.PersonID.pk)
+        print(person)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        training.delete()
+        return HttpResponseRedirect(reverse('RSR:detail', args=[training.PersonID.pk]))
 
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
 def skill_delete(request,pk,template_name='skill_update_form.html'):
@@ -845,8 +873,7 @@ def detail(request,pk):
     Award = detail_dic['PersonToAwards']
     Certification = detail_dic['PersonToCert']
     Training = detail_dic['PersonToTraining']
-    print('Certs',Certification)
-    print('Training',Training)
+    Titles = detail_dic['PersonToTitle']
     form = CommentsForm(request.POST or None, instance=person)
 
 
@@ -1187,6 +1214,7 @@ def detail(request,pk):
             persontoprofessional_temp.save()
             return HttpResponseRedirect(reverse('RSR:detail', args=[person.pk]))
     ## end add club
+    print('Titles: ',Titles)
     context = {
                 'form' : form,
                 'skillform': skillform,
@@ -1228,6 +1256,7 @@ def detail(request,pk):
                 'trainform':trainform,
                 'persontocertform':persontocertform,
                 'persontotrainform':persontotrainform,
+                'titles':Titles,
                 }
 
     return render(request, 'SearchExport/detail.html', context)
@@ -1268,7 +1297,10 @@ def parse_word_file(filepath):
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
 def search(request):
     arr = []
-    query_set = Person.objects.order_by('Name').distinct()
+    if request.user.groups.filter(name='Admin').exists():
+        query_set = Person.objects.order_by('Name').distinct()
+    else:
+        query_set = Person.objects.filter(CreatedBy = request.user)
     personFilter = PersonFilter(request.GET, query_set)
     if len(request.GET) != 0:
         if request.GET.get('Skills', '')!='' and request.GET.get('YearOfExperienceForSkill', '')!='':
@@ -1280,7 +1312,8 @@ def search(request):
         print('ARR',arr)
     if len(arr)  == 0:
         arr = list(personFilter.qs)
-    return render(request, 'SearchExport/search.html', {'personFilter': personFilter,'qs':arr})
+    count = len(arr)
+    return render(request, 'SearchExport/search.html', {'personFilter': personFilter,'qs':arr,'count':count,})
 
 class TrainingAutocomplete(autocomplete.Select2QuerySetView):
     # autocomplete function for ProfessionalDevelopment class

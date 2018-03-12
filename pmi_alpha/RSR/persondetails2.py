@@ -4,7 +4,7 @@ def Detail2(person):
     # List of related sets
     model_Names=['PersonToSchool', 'PersonToCourse', 'PersonToProfessionalDevelopment', 'PersonToSide',
                   'PersonToSkills', 'PersonToLanguage' , 'PersonToClearance', 'PersonToCompany', 'PersonToAwards',
-                  'PersonToClubs_Hobbies', 'PersonToVolunteering','PersonToCert','PersonToTraining']
+                  'PersonToClubs_Hobbies', 'PersonToVolunteering','PersonToCert','PersonToTraining','PersonToTitle']
     for model in model_Names:
         # Adjusting the model_Names to appriorate syntax for related_name reference
         # Related_names are a way to reverse foreign key

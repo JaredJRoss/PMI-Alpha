@@ -129,7 +129,7 @@ else:
                 }
             }
         }
-    elif 1==0:
+    elif 1==1:
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.mysql',

@@ -211,3 +211,4 @@ class MajorForm(forms.ModelForm):
 	class Meta:
 		model = Major
 		fields = '__all__'
+        

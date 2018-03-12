@@ -692,6 +692,45 @@ def clearance_edit(request,clearance_id):
     }
     return render(request, 'clearance_update_form.html', context)
 
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def certification_edit(request,CertID):
+    instance = get_object_or_404(PersonToCert, id=CertID)
+    form = PersontoProfessionalForm(request.POST or None, instance=instance)
+
+    if form.is_valid():
+        person = Person.objects.get(pk=instance.PersonID.pk)
+        print(person)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        form.save()
+        return HttpResponseRedirect(reverse('RSR:detail', args=[instance.PersonID.pk]))
+
+    context = {
+        'form': form,
+        'pk':CertID,
+        'person': instance
+    }
+    return render(request, 'certification_update_form.html', context)
+
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def training_edit(request,CertID):
+    instance = get_object_or_404(PersonToTraining, id=TrainID)
+    form = PersontoProfessionalForm(request.POST or None, instance=instance)
+
+    if form.is_valid():
+        person = Person.objects.get(pk=instance.PersonID.pk)
+        print(person)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        form.save()
+        return HttpResponseRedirect(reverse('RSR:detail', args=[instance.PersonID.pk]))
+
+    context = {
+        'form': form,
+        'pk':TrainID,
+        'person': instance
+    }
+    return render(request, 'training_update_form.html', context)
 #end edit
 
 ##########delete##############
@@ -818,6 +857,29 @@ def professional_delete(request,pk,template_name='detail.html'):
         return HttpResponseRedirect(reverse('RSR:detail', args=[professional.PersonID.pk]))
     return render(request, template_name, {'object': professional})
 
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def certification_delete(request,pk,template_name='detail.html'):
+    professional = get_object_or_404(PersonToProfessionalDevelopment, pk=pk)
+    if request.method == 'POST':
+        person = Person.objects.get(pk=professional.PersonID.pk)
+        print(person)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        professional.delete()
+        return HttpResponseRedirect(reverse('RSR:detail', args=[professional.PersonID.pk]))
+    return render(request, template_name, {'object': professional})
+
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def training_delete(request,pk,template_name='detail.html'):
+    professional = get_object_or_404(PersonToProfessionalDevelopment, pk=pk)
+    if request.method == 'POST':
+        person = Person.objects.get(pk=professional.PersonID.pk)
+        print(person)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        professional.delete()
+        return HttpResponseRedirect(reverse('RSR:detail', args=[professional.PersonID.pk]))
+    return render(request, template_name, {'object': professional})
 #########end delete###########
 
 

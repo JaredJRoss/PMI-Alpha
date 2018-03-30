@@ -11,7 +11,6 @@ import re
 # Create your views here.
 #=======
 # -*- coding: utf-8 -*-
-from _mysql_exceptions import *
 from django.shortcuts import render
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
@@ -163,7 +162,6 @@ def parse_back(words,doc_id,doc_type,userID):
                     try:
                         query_set = Skills(Name = key["skill"])
                         query_set.save()
-
                     except Exception as e:
                         print(e)
                         print("Could not add skill ",key["skill"])

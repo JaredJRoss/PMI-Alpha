@@ -1,3 +1,4 @@
+pip==9.0.3
 argcomplete==1.8.2
 asn1crypto==0.23.0
 awsebcli==3.12.1

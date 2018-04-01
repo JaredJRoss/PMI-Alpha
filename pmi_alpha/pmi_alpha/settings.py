@@ -136,7 +136,7 @@ else:
                 'NAME':'ebdb',
                 'USER': 'jross428',
                 'PASSWORD': 'paradyme',
-                'HOST': 'aa126avf92yml0r.csbucglvuwdm.us-east-1.rds.amazonaws.com',
+                'HOST': 'aamboqm7t29sik.csbucglvuwdm.us-east-1.rds.amazonaws.com',
                 'PORT': '3306',
                 'OPTIONS': {
                     'sql_mode': 'traditional',

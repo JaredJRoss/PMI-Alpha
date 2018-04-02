@@ -6,10 +6,11 @@ from django.contrib.auth import logout, authenticate, login
 from common.forms import *
 from common.models import *
 
+from django.contrib.auth.models import User
+from django.conf import settings
 
 @login_required
 def home(request):
-    print('crm')
     return render(request, 'crm/index.html')
 
 
@@ -17,7 +18,7 @@ def home(request):
 def login_crm(request):
     print('login')
     if request.user.is_authenticated:
-        return HttpResponseRedirect('/CRM')
+        return HttpResponseRedirect('/')
     if request.method == 'POST':
         user = authenticate(username=request.POST.get('email'), password=request.POST.get('password'))
         if user is not None:
@@ -32,7 +33,7 @@ def register_page(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = CRMUser.objects.create_user(
+            user = User.objects.create_user(
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password1'],
                 email=form.cleaned_data['email'],

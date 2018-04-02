@@ -6,7 +6,7 @@ app_name = 'common'
 
 
 urlpatterns = [
-    url(r'^$', views.home, name="home-crm"),
-    url(r'^login/$', views.login_crm, name="home-crm"),
-    url(r'^registration/$', views.register_page, name='create-crm')
+    url(r'^$', views.home, name="home"),
+    url(r'^login/$', views.login_crm, name="home"),
+    url(r'^registration/$', views.register_page, name='create')
 ]

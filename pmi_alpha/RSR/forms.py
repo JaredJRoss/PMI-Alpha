@@ -22,6 +22,12 @@ class NewPersonToTrainForm(forms.ModelForm):
         model = PersonToTraining
         fields = ('Interest','Completion_date')
 
+class NewPersontoTitleForm(forms.ModelForm):
+    class Meta:
+     	model = PersonToTitle
+     	exclude = ('PersonID',)
+     	fields = ('TitleID',)
+
 class NewPersontoSkillForm(forms.ModelForm):
 
     class Meta:
@@ -84,7 +90,10 @@ class PersontoSkillForm(forms.ModelForm):
 	class Meta:
 		model = PersonToSkills
 		fields = '__all__'
-
+class PersontoTitleForm(forms.ModelForm):
+	class Meta:
+		model = PersonToTitle
+		fields = '__all__'
 class PersontoCertForm(forms.ModelForm):
     class Meta:
         model = PersonToCert
@@ -151,6 +160,10 @@ class DocumentForm(forms.Form):
 
 	docfile = forms.FileField(widget=forms.FileInput(attrs={'multiple':True,'accept':dataconfig}),label='Select a file:')
 
+class TitleForm(forms.ModelForm):
+	class Meta:
+		model = Title
+		fields = '__all__'
 class SkillForm(forms.ModelForm):
 	class Meta:
 		model = Skills
@@ -211,4 +224,3 @@ class MajorForm(forms.ModelForm):
 	class Meta:
 		model = Major
 		fields = '__all__'
-        

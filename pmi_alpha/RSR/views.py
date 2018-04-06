@@ -499,6 +499,24 @@ def skill_edit(request, skill_id):
     return render(request, 'skill_update_form.html', context)
 
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def title_edit(request, title_id):
+    instance = get_object_or_404(PersonToTitle, id=title_id)
+    form = PersontoTitleForm(request.POST or None, instance=instance)
+
+    if form.is_valid():
+        person = Person.objects.get(pk=instance.PersonID.pk)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        form.save()
+
+        return HttpResponseRedirect(reverse('RSR:detail', args=[instance.PersonID.pk]))
+    context = {
+        'form': form,
+        'pk':title_id,
+        'person': instance
+    }
+    return render(request, 'title_update_form.html', context)
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
 def company_edit(request, company_id):
     instance = get_object_or_404(PersonToCompany, id=company_id)
     form = PersontoCompanyForm(request.POST or None, instance=instance)
@@ -734,7 +752,17 @@ def skill_delete(request,pk,template_name='skill_update_form.html'):
         return HttpResponseRedirect(reverse('RSR:detail', args=[skills.PersonID.pk]))
     return render(request, template_name, {'object': skills})
 
-
+@user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
+def title_delete(request,pk,template_name='title_update_form.html'):
+    title = get_object_or_404(PersonToTitle, pk=pk)
+    if request.method == 'POST':
+        person = Person.objects.get(pk=title.PersonID.pk)
+        print(person)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        title.delete()
+        return HttpResponseRedirect(reverse('RSR:detail', args=[title.PersonID.pk]))
+    return render(request, template_name, {'object': title})
 
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
 def company_delete(request,pk,template_name='detail.html'):
@@ -917,6 +945,23 @@ def detail(request,pk):
             p2t.save()
         return HttpResponseRedirect(reverse('RSR:detail', args=[person.pk]))
 
+    #add title
+    titleform = TitleForm(request.POST)
+    if titleform.is_valid() and not titleform.cleaned_data['Name'] == "":
+        print('here')
+        person = Person.objects.get(pk=pk)
+        person.LastUpdated = datetime.now()
+        person.save(update_fields=['LastUpdated'])
+        titleform.save(commit=False)
+        query_set = Title.objects.all()
+        if not query_set.filter(Name=titleform.cleaned_data['Name']):
+            titleform.save()
+            query_set = query_set.filter(Name=titleform.cleaned_data['Name'])[0]
+        else:
+            query_set = query_set.filter(Name=titleform.cleaned_data['Name'])[0]
+        PersonToTitle.objects.create(PersonID = person, TitleID = query_set)
+
+        return HttpResponseRedirect(reverse('RSR:detail', args=[person.pk]))
 
     #add Skill
     skillform = SkillForm(request.POST)
@@ -1212,10 +1257,10 @@ def detail(request,pk):
             persontoprofessional_temp.save()
             return HttpResponseRedirect(reverse('RSR:detail', args=[person.pk]))
     ## end add club
-    print('Titles: ',Titles)
     context = {
                 'form' : form,
                 'skillform': skillform,
+                'titleform':titleform,
                 'majorform':majorform,
                 'schoolform':schoolform,
                 'persontoschool':persontoschool,
@@ -1321,6 +1366,15 @@ class TrainingAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(Name__icontains=self.q)
         return qs
+class PositionAutocomplete(autocomplete.Select2QuerySetView):
+    # autocomplete function for ProfessionalDevelopment class
+    def get_queryset(self):
+        qs = Title.objects.all().order_by('Name').distinct()
+
+        if self.q:
+            qs = qs.filter(Name__icontains=self.q)
+        return qs
+
 
 class CertificationAutocomplete(autocomplete.Select2QuerySetView):
     # autocomplete function for ProfessionalDevelopment class

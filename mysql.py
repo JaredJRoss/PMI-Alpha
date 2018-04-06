@@ -10,7 +10,7 @@ r=db.store_result()
 for i in range(0,r.num_rows()):
     arr.append(r.fetch_row()[0][0].decode('utf-8'))
 print(arr)
-db = MySQLdb.connect(host="aa126avf92yml0r.csbucglvuwdm.us-east-1.rds.amazonaws.com",user="jross428",passwd="paradyme",db="ebdb")
+db = MySQLdb.connect(host="aamboqm7t29sik.csbucglvuwdm.us-east-1.rds.amazonaws.com",user="jross428",passwd="paradyme",db="ebdb")
 c=db.cursor()
 c.execute("""SET FOREIGN_KEY_CHECKS = 0;""")
 for cmd in arr:

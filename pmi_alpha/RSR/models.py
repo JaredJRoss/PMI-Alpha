@@ -19,7 +19,7 @@ class Document(models.Model):
     def __unicode__(self):
         return u'%s' %self.docfile
     def __str__(self):
-        return self.docfile.url   
+        return self.docfile.url
     def delete(self, *args, **kwargs):
         os.remove(os.path.join(settings.MEDIA_ROOT, self.docfile.name))
         super(Document, self).delete(*args, **kwargs)

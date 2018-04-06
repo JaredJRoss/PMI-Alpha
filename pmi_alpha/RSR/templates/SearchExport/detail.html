@@ -26,6 +26,7 @@
 </script>
 <div class="tab">
   <button class="tablinks" onclick="openTab(event, 'Personal')" id="defaultOpen">Personal Info</button>
+  <button class="tablinks" onclick="openTab(event, 'Position')">Positions</button>
   <button class="tablinks" onclick="openTab(event, 'Skills')">Skills</button>
   <button class="tablinks" onclick="openTab(event, 'Past Work')">Past Work</button>
   <button class="tablinks" onclick="openTab(event, 'School')">Academics</button>
@@ -68,14 +69,7 @@
 
    </tr>
    {% endfor %}
-  <tr>
-    <td class = "text-left" style="padding:10px;font-weight: bold;">Positions</td>
-    <td style ="word-wrap:break-word;padding:10px;" class = "text-left">
-        {% for t in titles %}
-        {{t.TitleID.Name}},
-        {% endfor %}
-      </td>
-  </tr>
+
    </tbody>
  </table>
     <br/>
@@ -93,6 +87,43 @@
 
 
 <!--Right hand side all tables -->
+
+
+<div id="Position" class="tabcontent">
+<table class = "table-fill">
+<thead>
+ <tr>
+   <th style = "padding:14px;"class = "text-left">Title</th>
+   <th style = "padding:14px;"class = "text-left">Action</th>
+ </tr>
+
+</thead>
+<tbody class="table-hover">
+ {% for obj in titles %}
+   <tr>
+     <td style = "padding:14px;"class = "text-left">{{obj.TitleID.Name}}</td>
+     <td style = "padding:14px;"class = "text-left">
+         <a href="{% url 'RSR:title-edit' obj.pk %}" class="btn btn-default btn-file">Edit</a>
+     </td>
+   </tr>
+ {% empty %}
+   <tr>
+     <td colspan="2">No data</td>
+   </tr>
+ {% endfor %}
+ <tr>
+   <form method="POST" class="post-form">{% csrf_token %}
+   <td style = "padding:14px;"class = "text-left">
+    {% render_field titleform.Name class="form-control" placeholder="Add Position"%}
+   </td>
+  <td style = "padding:14px;"class = "text-left"><button type="submit" style = "margin:auto" class = "btn btn-default btn-file">Add</button>
+    </td>
+  </form>
+  </tr>
+
+</tbody>
+</table>
+</div>
 
 
     <div id="Skills" class="tabcontent">

@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^logout/$', views.logout_page, name = 'logout'),
     #Search/Export Team
     url(r'^edit_skill/(?P<skill_id>\d+)/$', views.skill_edit, name='skill-edit'),
+    url(r'^edit_title/(?P<title_id>\d+)/$', views.title_edit, name='title-edit'),
     url(r'^edit_cert/(?P<cert_id>\d+)/$', views.cert_edit, name='cert-edit'),
     url(r'^edit_train/(?P<train_id>\d+)/$', views.train_edit, name='train-edit'),
     url(r'^edit_company/(?P<company_id>\d+)/$', views.company_edit, name='company-edit'),
@@ -57,6 +58,7 @@ urlpatterns = [
 
     #Delete
     url(r'^delete_skill/(?P<pk>\d+)$', views.skill_delete, name="skill-delete"),
+    url(r'^delete_title/(?P<pk>\d+)$', views.title_delete, name="title-delete"),
     url(r'^delete_company/(?P<pk>\d+)/$', views.company_delete, name="company-delete"),
     url(r'^delete_school/(?P<pk>\d+)/$', views.school_delete, name="school-delete"),
     url(r'^delete_course/(?P<pk>\d+)/$', views.course_delete, name="course-delete"),
@@ -79,6 +81,8 @@ urlpatterns = [
         #url for autocomplete function for ProfessionalDevelopment class
     url(r'^search/ProfessionalDevelopment-autocomplete/$', ProfessionalDevelopmentAutocomplete.as_view(),
         name='ProfessionalDevelopment-autocomplete',),
+    url(r'^search/Position-autocomplete/$', PositionAutocomplete.as_view(),
+        name='Position-autocomplete',),
         #url for autocomplete function for skills class
     url(r'^search/Skills-autocomplete/$', Skillsutocomplete.as_view(),
         name='Skills-autocomplete',),

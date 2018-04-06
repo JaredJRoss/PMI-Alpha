@@ -70,6 +70,10 @@
                 {% render_field personFilter.form.Name class="form-control" %}
                 </div>
                 <div class="form-group col-sm-3 col-md-3">
+                Position:
+                {% render_field personFilter.form.Position class="form-control" %}
+                </div>
+                <div class="form-group col-sm-3 col-md-3">
                 Type:
                 {% render_field personFilter.form.TypeResume class="form-control" %}
                 </div>
@@ -166,7 +170,7 @@
                 </div>
                 <div class="form-group col-sm-4 col-md-3">
                     Title:
-                    {% render_field personFilter.form.Title class="form-control" %}
+                    {% render_field personFilter.form.Title_comp class="form-control" %}
                 </div>
 
                 </fieldset>

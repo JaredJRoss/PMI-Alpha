@@ -103,10 +103,15 @@ class PersonFilter(django_filters.FilterSet):
     CompanyWorked = django_filters.ModelMultipleChoiceFilter(name='persontocompany__CompanyID',
                                                      queryset=Company.objects.all().order_by('Name').distinct(),
                                                      widget=autocomplete.ModelSelect2Multiple(url='RSR:Company-autocomplete'))
-    Title = django_filters.ModelMultipleChoiceFilter(name='persontocompany__Title',
+    Title_comp = django_filters.ModelMultipleChoiceFilter(name='persontocompany__Title',
                                              queryset=PersonToCompany.objects.order_by('Title').distinct(),
                                              widget=autocomplete.ModelSelect2Multiple(
                                                  url='RSR:Title-autocomplete'))
+
+    Position = django_filters.ModelMultipleChoiceFilter(name='persontotitle__TitleID',
+                                             queryset=Title.objects.all().order_by('Name').distinct(),
+                                             widget=autocomplete.ModelSelect2Multiple(
+                                                 url='RSR:Position-autocomplete'))
     Volunteering = django_filters.ModelMultipleChoiceFilter(name='persontovolunteering__VolunID',
                                                     queryset=Volunteering.objects.all().distinct().order_by('Name'),
                                                     widget=autocomplete.ModelSelect2Multiple(url='RSR:Volunteering-autocomplete'))
@@ -124,5 +129,5 @@ class PersonFilter(django_filters.FilterSet):
     class Meta:
         model = Person
         fields = ['SchoolAttend', 'GraduateDate', 'Major', 'DegreeLevel', 'GPAlb', 'GPAub','Language', 'Skills',
-                   'YearOfExperienceForSkill', 'ProfessionalDevelopment', 'Award', 'CompanyWorked', 'Title','Training',
-                   'SecurityClearance', 'Volunteering', 'Club_Hobby','TypeResume','UploadDate','Name', 'Skills_AND','Level','Certification']
+                   'YearOfExperienceForSkill', 'ProfessionalDevelopment', 'Award', 'CompanyWorked', 'Title_comp','Training',
+                   'SecurityClearance', 'Volunteering', 'Club_Hobby','TypeResume','UploadDate','Name', 'Skills_AND','Level','Certification','Position']

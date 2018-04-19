@@ -1,11 +1,11 @@
 argcomplete==1.8.2
 asn1crypto==0.23.0
-awsebcli==3.12.2
+awsebcli==3.12.1
 bcrypt==3.1.4
 beautifulsoup4==4.5.3
 blessed==1.14.2
 boto==2.48.0
-botocore==1.8.42
+botocore==1.8.36
 bz2file==0.98
 cachetools==2.0.1
 cement==2.8.2
@@ -13,12 +13,11 @@ certifi==2018.1.18
 cffi==1.11.2
 chardet==3.0.4
 colorama==0.3.7
-cryptography==2.1.2
 cymem==1.31.2
 cytoolz==0.8.2
 datefinder==0.6.1
 dill==0.2.7.1
-Django==2.0.3
+Django==2.0.2
 django-autocomplete-light==3.2.10
 django-background-tasks==1.1.11
 django-bootstrap3==9.0.0
@@ -26,8 +25,8 @@ django-compat==1.0.15
 django-crispy-forms==1.7.0
 django-filter==1.1.0
 django-filters==0.2.1
-django-simple-pagination==1.1.8
 django-tables2==1.13.0
+django-simple-pagination==1.1.8
 django-watson==1.4.3
 django-webpack-loader==0.5.0
 django-widgets-improved==1.5.0
@@ -81,6 +80,7 @@ grpc-google-iam-v1==0.11.4
 grpcio==1.4.0
 html5lib==1.0.1
 httplib2==0.10.3
+icalendar==4.0.1
 idna==2.6
 jmespath==0.9.3
 lxml==4.1.0
@@ -95,7 +95,7 @@ olefile==0.44
 pandas==0.20.3
 paramiko==2.3.1
 pathlib==1.0.1
-pathspec==0.5.5
+pathspec==0.5.0
 Pillow==4.3.0
 plac==0.9.6
 ply==3.8
@@ -115,7 +115,7 @@ python-crfsuite==0.9.5
 python-dateutil==2.6.1
 python-Levenshtein==0.12.0
 python-pptx==0.6.5
-pytz==2018.3
+pytz==2017.3
 PyYAML==3.12
 regex==2017.4.5
 requests==2.18.4
@@ -124,10 +124,8 @@ scipy==1.0.0
 semantic-version==2.5.0
 six==1.11.0
 smart-open==1.5.3
-SpeechRecognition==3.6.3
 tabulate==0.7.5
 termcolor==1.1.0
-textract==1.6.1
 thinc==6.10.2
 toolz==0.9.0
 tqdm==4.19.5

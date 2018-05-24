@@ -743,7 +743,6 @@ def extract_all_skills(resume):
     special_characters = ['!','#', '$', '%','&','*','-', '/', '=','?',
                           '^','.','_','`', '{', '|', '}','~', "'", ',', '(',')', ':', '•', '§' ]
     unigram_resume = resume_processing(resume_text,special_characters)
-    print('time1')
     #Create bigram model
     bigram_resume = create_bigram(unigram_resume)
     #Create trigram model
@@ -755,7 +754,6 @@ def extract_all_skills(resume):
         unlabeled_sent = [word[0] for word in labeled_sent]
         for i, (w, label) in enumerate(labeled_sent):
             featuresets.append((extract_features(unlabeled_sent, i,skill_list), label))
-    print('time2')
 
     size = int(len(featuresets)*0.1)
     train_set = featuresets[size:]

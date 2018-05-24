@@ -48,22 +48,21 @@ import textract
 from django.contrib.auth.decorators import user_passes_test
 
 
-
+#logout button redirects to this view
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
-
 def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/')
-
+#work in progress for react dashboard
 def dashboard(request):
     return render(request,'dashboard/barchart.html')
 
-
+#gets the home page
 @login_required
 def main(request):
     return render(request, 'main.html')
 
-
+#gets the string of an ocr resume using Image lib
 def get_string(name):
     img=Image.open(name)
     utf8_text = pytesseract.image_to_string(img)
@@ -87,32 +86,37 @@ def lemmatized_sentence_corpus(filename):
         for sent in parsed_res.sents:
             yield u' '.join([token.lemma_ for token in sent if not punct_space(token)])
 
+# this is to make new word2vec models not used right now but can use background to schedule it to build every week at midnight
 @background(schedule=timezone.now())
 def load_parsing_files():
     normal_res  = ''
+    #get all documents and text
     docs = Document.objects.all()
-    print(docs)
     for doc in docs:
         normal_res = normal_res + doc.wordstr
+    #feed the string into a word2vec model which will create
     res2vec = Word2Vec(normal_res,size=300,window=10,sg=1,workers=4,min_count=5)
+    #overwrite the old model? not sure if this will do that exactly
     res2vec.save(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..','..','www','Parsing','vector_models1')))
-
+    #train the model with 15 iterations
     for i in range(1,15):
          res2vec.train(normal_res,total_examples=res2vec.corpus_count, epochs=res2vec.iter)
          res2vec.save(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..','..','www','Parsing','vector_models1')))
 
-#@background(schedule=timezone.now())
+#parsing should be in the background unless testing locally since it takes long and dont want users sitting through that.  In the future could use celery to thread in a more custom way that is not one by one
+@background(schedule=timezone.now())
 def parse_back(words,doc_id,doc_type,userID):
+    #parse.py file has parse_file
     parsed_json  = parse_file(words)
     #either load json, or recieve json file
     js = parsed_json
     #iterate through json file
     print('\n\n',js,'\n\n')
     #initialize person out side of for loop/if statements so we can use it later
-
     person = Person(Name="temp")
     user = User.objects.get(pk = userID)
     print(user)
+    #gets who uploaded the person for permissions
     person.CreatedBy = user
     for key in js['person']:
         if key == "name":
@@ -146,11 +150,13 @@ def parse_back(words,doc_id,doc_type,userID):
     print("DOC ",doc_id)
     person.Resume = Document.objects.get(pk = doc_id)
     person.TypeResume = doc_type
+    #Database issues with certain fields made us have to use try catch when saving so background didnt crash
     try:
         person.save()
     except Error.DataError:
         person.Name = person.Name[0:20]
         person.save()
+    #go through each label and parse into the database
     for label in js:
         if label == "skills":
             for key in js[label]:
@@ -352,23 +358,23 @@ def parse_back(words,doc_id,doc_type,userID):
 @login_required
 def uploaddoc(request):
 # Handle file upload
-    print(User.objects.get(pk=request.user.pk))
     if request.method == 'POST':
         form = DocumentForm()
-        print(request.FILES)
+        #gets the list of files uploade
         files = request.FILES.getlist('docfile')
+        #one by one adds the files to the background parser
         for f in files:
             temp_doc = Document(docfile = f)
             temp_doc.type = request.POST['type']
             temp_doc.uploaduser = request.user.username
             temp_doc.save()
+            #uses textract for documents
             if ".doc" in temp_doc.docfile.path:
-                print (temp_doc.docfile.path)
                 temp_doc.wordstr = parse_word_file(temp_doc.docfile.path)
-                print (temp_doc.wordstr)
                 temp_doc.save(update_fields=['wordstr'])
 
                 ### UNCOMMENT THESE LINES FOR MAC/LINUX USERS: OCR/TEXTRACT
+            #use OCR technology for images and pdfs
             else:
                 temp_doc.wordstr = textract.process(temp_doc.docfile.path).decode("utf-8")
                 if len(temp_doc.wordstr) < 50:
@@ -388,7 +394,6 @@ def uploaddoc(request):
                     temp_doc.save(update_fields=['wordstr'])
 
                 temp_doc.save(update_fields=['wordstr'])
-            print("temp:" ,temp_doc.docfile)
 
             parse_back(temp_doc.wordstr,temp_doc.pk,temp_doc.type,request.user.pk)
     else:
@@ -396,24 +401,7 @@ def uploaddoc(request):
     documents = Document.objects.all()
     return render(request,'index.html',{'documents': documents,'form':form})
 
-@background
-def do_ocr(doc_pk):
-    words = ''
-    img=IMG(filename=temp_doc.docfile.path,resolution=200)
-    cur = os.path.dirname(os.path.abspath(__file__))
-    img.save(filename=os.path.join(cur,'temp.jpg'))
-    r = re.compile(r'temp-')
-    for f in os.listdir(cur):
-        print("File :",f)
-        if r.match(f):
-            print("parsing ",f)
-            utf8_text = get_string(os.path.join(cur,f))
-            os.remove(os.path.join(cur,f))
-            words = words+utf8_text
-    temp_doc.wordstr = words
-    temp_doc.save(update_fields=['wordstr'])
-
-#edit function
+#edit functions
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
 def person_edit(request, person_id):
 
@@ -877,14 +865,16 @@ def professional_delete(request,pk,template_name='detail.html'):
 
 
 
-
+# detail page for each person
 @login_required
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
 def detail(request,pk):
        # Get the current person object using pk or id
+    #If the person exists return otherwise send 404 page
     person = get_object_or_404(Person, pk=pk)
+    #use persondetails file
     related_obj_list=Detail(person)
-
+    #use persondetails2 file for dict
     detail_dic = Detail2(person)
     School_Detail = detail_dic['PersonToSchool']
     Course_Detail = detail_dic['PersonToCourse']
@@ -900,9 +890,9 @@ def detail(request,pk):
     Certification = detail_dic['PersonToCert']
     Training = detail_dic['PersonToTraining']
     Titles = detail_dic['PersonToTitle']
+    #begin forms to add
+    #add comments to a person
     form = CommentsForm(request.POST or None, instance=person)
-
-
     if form.is_valid():
         person = Person.objects.get(pk=pk)
         print(person)
@@ -1257,6 +1247,8 @@ def detail(request,pk):
             persontoprofessional_temp.save()
             return HttpResponseRedirect(reverse('RSR:detail', args=[person.pk]))
     ## end add club
+    #end adding stuff
+    #if you add a form you need to add it the context
     context = {
                 'form' : form,
                 'skillform': skillform,
@@ -1336,6 +1328,7 @@ def parse_word_file(filepath):
 
 
 # SEARCH/EXPORT TEAM
+# code to use filters in the main search page
 @login_required
 @user_passes_test(lambda u: u.groups.filter(name='RSR').exists())
 def search(request):
@@ -1346,18 +1339,19 @@ def search(request):
         query_set = Person.objects.filter(CreatedBy = request.user)
     personFilter = PersonFilter(request.GET, query_set)
     if len(request.GET) != 0:
+        #need to manually combine skills and years of experience
         if request.GET.get('Skills', '')!='' and request.GET.get('YearOfExperienceForSkill', '')!='':
             for p in personFilter.qs:
                 if len(PersonToSkills.objects.filter(PersonID = p.pk)\
                     .filter(SkillsID =request.GET.get('Skills', ''))\
                     .filter(YearsOfExperience = request.GET.get('YearOfExperienceForSkill', ''))) !=0:
                     arr.append(p)
-        print('ARR',arr)
     if len(arr)  == 0:
         arr = list(personFilter.qs)
     count = len(arr)
     return render(request, 'SearchExport/search.html', {'personFilter': personFilter,'qs':arr,'count':count,})
 
+#start autocomplete code
 class TrainingAutocomplete(autocomplete.Select2QuerySetView):
     # autocomplete function for ProfessionalDevelopment class
     def get_queryset(self):

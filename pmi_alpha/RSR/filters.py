@@ -3,7 +3,7 @@ from .models import *
 from django import forms
 from django.forms import TextInput
 from dal import autocomplete
-
+#This is to filter on type of types of people uploaded
 class UploadListFilter(django_filters.FilterSet):
 
   TYPERESUME_CHOICES = (('Employee', 'Employee'),
@@ -13,7 +13,7 @@ class UploadListFilter(django_filters.FilterSet):
 
 )
 
-
+#filter to filter on document type
   type = django_filters.ChoiceFilter(choices=TYPERESUME_CHOICES)
   class Meta:
       model = Document
@@ -21,7 +21,7 @@ class UploadListFilter(django_filters.FilterSet):
       order_by = ['pk']
 
 
-
+#Main filter to look at people that are uploaded
 class PersonFilter(django_filters.FilterSet):
     INTEREST_LEVEL = (
             ('Interested', 'Interested'),
@@ -38,7 +38,7 @@ class PersonFilter(django_filters.FilterSet):
     ('Intern', 'Intern'),
     ('Prospective Employee', 'Prospective Employee'),
     ('Prospective Intern', 'Prospective Intern'))
-
+    #Used for skill levels
     Levels = (
     ('0','0'),
     ('1', '1'),
@@ -52,19 +52,20 @@ class PersonFilter(django_filters.FilterSet):
     ('9', '9'),
     ('10','10')
 )
+    #look at the role of the person
     TypeResume = django_filters.ChoiceFilter(name='TypeResume', choices=TYPERESUME_CHOICES)
-
+    #when the resume was uploaded this is added automatically during upload
     UploadDate = django_filters.DateFilter(name='CreationDate',input_formats=['%Y-%m-%d', '%m-%d-%Y', '%Y/%m/%d','%m/%d/%Y', '%Y%m%d', '%m%d%Y']\
     , lookup_expr='icontains')
-
+    #what school was attended
     SchoolAttend = django_filters.ModelMultipleChoiceFilter(name='persontoschool__SchoolID', queryset=School.objects.all().order_by('Name'),
                                           widget=autocomplete.ModelSelect2Multiple(url='RSR:School-autocomplete'))
-
     GraduateDate = django_filters.ModelChoiceFilter(name='persontoschool__GradDate',
                                                     queryset=PersonToSchool.objects.values_list('GradDate',flat=True).
                                                     distinct().order_by('GradDate'),
                                                     to_field_name='GradDate')
     Major = django_filters.ModelChoiceFilter(name='persontoschool__MajorID', queryset=Major.objects.all().order_by('Name').distinct())
+
     Certification = django_filters.ModelMultipleChoiceFilter(name='persontocert__CertID',
                                                   queryset=Certifications.objects.all().order_by('Name').distinct(),
                                                   widget= autocomplete.ModelSelect2Multiple(url='RSR:Certification-autocomplete') )
@@ -74,7 +75,9 @@ class PersonFilter(django_filters.FilterSet):
     DegreeLevel = django_filters.ModelChoiceFilter(name='persontoschool__SchoolID__DegreeLevel',
                                                    queryset=School.objects.values_list('DegreeLevel',flat=True).distinct(),
                                                    to_field_name='DegreeLevel')
+    #GPA lower bound
     GPAlb = django_filters.NumberFilter(name='persontoschool__GPA',lookup_expr='gte')
+    #GPA upper bound
     GPAub = django_filters.NumberFilter(name='persontoschool__GPA',lookup_expr='lt')
     Coursework = django_filters.ModelMultipleChoiceFilter(name='persontocourse__Desc',
                                                   queryset=PersonToCourse.objects.distinct().order_by('Desc'),
@@ -86,6 +89,7 @@ class PersonFilter(django_filters.FilterSet):
     Skills = django_filters.ModelMultipleChoiceFilter(name='persontoskills__SkillsID',
                                               queryset=Skills.objects.all().order_by('Name').distinct(),
                                               widget=autocomplete.ModelSelect2Multiple(url='RSR:Skills-autocomplete'))
+    #filter are by different or so for ex who knows python or html this is for who knows python and html
     Skills_AND = django_filters.ModelMultipleChoiceFilter(name='persontoskills__SkillsID',
                                                       queryset=Skills.queryset.order_by('Name').distinct(),
                                                       widget=autocomplete.ModelSelect2Multiple(
@@ -103,6 +107,7 @@ class PersonFilter(django_filters.FilterSet):
     CompanyWorked = django_filters.ModelMultipleChoiceFilter(name='persontocompany__CompanyID',
                                                      queryset=Company.objects.all().order_by('Name').distinct(),
                                                      widget=autocomplete.ModelSelect2Multiple(url='RSR:Company-autocomplete'))
+    #Title at the company
     Title_comp = django_filters.ModelMultipleChoiceFilter(name='persontocompany__Title',
                                              queryset=PersonToCompany.objects.order_by('Title').distinct(),
                                              widget=autocomplete.ModelSelect2Multiple(
@@ -125,7 +130,7 @@ class PersonFilter(django_filters.FilterSet):
                                           widget=autocomplete.ModelSelect2Multiple(url='RSR:Name-autocomplete'))
     Level = django_filters.ModelChoiceFilter(name='persontoskills__Level',queryset=PersonToSkills.objects.values_list('Level',flat=True).
     order_by('Level').distinct(),to_field_name='Level')
-
+    #if you add a new filter you have to add it to the list of fields or else it wont show up
     class Meta:
         model = Person
         fields = ['SchoolAttend', 'GraduateDate', 'Major', 'DegreeLevel', 'GPAlb', 'GPAub','Language', 'Skills',

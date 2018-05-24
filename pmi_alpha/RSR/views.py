@@ -101,7 +101,7 @@ def load_parsing_files():
          res2vec.train(normal_res,total_examples=res2vec.corpus_count, epochs=res2vec.iter)
          res2vec.save(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..','..','www','Parsing','vector_models1')))
 
-@background(schedule=timezone.now())
+#@background(schedule=timezone.now())
 def parse_back(words,doc_id,doc_type,userID):
     parsed_json  = parse_file(words)
     #either load json, or recieve json file

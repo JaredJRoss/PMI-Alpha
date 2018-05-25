@@ -41,6 +41,7 @@ from oauth2client import tools
 
 #main function goes through all different extraction and puts it into a dictionary so it can be put into the database
 def parse_file(resume):
+    #get the google credentials so we can use
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.path.join(os.path.dirname(__file__),'Parsing-385521996355.json')
     credentials = ServiceAccountCredentials.from_json_keyfile_name(os.path.join(os.path.dirname(__file__),'Parsing-385521996355.json'), scopes='https://www.googleapis.com/auth/cloud-language')
     #credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/jared/Parsing-385521996355.json',scopes ='https://www.googleapis.com/auth/cloud-language' )
